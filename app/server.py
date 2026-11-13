@@ -17,6 +17,7 @@ import contextlib
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from mcp.server.mcpserver import MCPServer
+from mcp.server.transport_security import TransportSecuritySettings
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from . import config, store, tools_impl
@@ -114,7 +115,12 @@ class BuyerAuthMiddleware(BaseHTTPMiddleware):
         return await call_next(request)
 
 
-_mcp_app = mcp.streamable_http_app(streamable_http_path="/")
+_mcp_app = mcp.streamable_http_app(
+    streamable_http_path="/",
+    transport_security=TransportSecuritySettings(
+        allowed_hosts=config.MCP_ALLOWED_HOSTS
+    ),
+)
 
 
 @contextlib.asynccontextmanager
