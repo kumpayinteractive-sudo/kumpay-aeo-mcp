@@ -1,5 +1,7 @@
 # Kumpay AEO MCP
 
+[![mcptry](https://mcptry.com/badge/io.github.kumpayinteractive-sudo/kumpay-aeo-mcp)](https://mcptry.com/servers/io.github.kumpayinteractive-sudo/kumpay-aeo-mcp)
+
 Remote MCP server that gives AI agents live SEO data: SERP competition
 analysis, keyword research, backlink profiles, full site audits, and
 AI-search visibility scoring — via 7 metered MCP tools.
