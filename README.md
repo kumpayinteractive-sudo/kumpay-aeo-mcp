@@ -95,10 +95,10 @@ Buy a credit pack at https://whop.kumpaytech.com — Starter is $29 for
 100 credits, one-time, credits never expire. Then email
 kumpaytech@gmail.com with your purchase receipt to get your API key
 (keys are issued manually). Paid tools: competition and backlink analysis
-10 credits each, site audits 1 credit per page. Keyword research, AI
-visibility audits, status checks and location lookups are free. The plugin
-declares a 100-credit spend limit per chat, and Hermes asks before each
-call.
+€2.63 each, site audits €0.26 per page (effective prices at the Starter
+rate; larger packs cost less per call). Keyword research, AI visibility
+audits, status checks and location lookups are free. The plugin declares
+a €26.35 spend limit per chat, and Hermes asks before each call.
 
 Disclosure: every tool call goes to `https://mcp.kumpaytech.com/mcp` and
 forwards the domains, keywords and business names you check to Kumpay

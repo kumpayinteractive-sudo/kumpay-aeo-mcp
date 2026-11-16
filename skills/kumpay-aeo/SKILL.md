@@ -1,6 +1,6 @@
 ---
 name: kumpay-aeo
-description: "Use Kumpay AEO whenever a task needs live SEO or AI-search visibility data: keyword research with volume and CPC, SERP competition analysis for a domain, backlink profiles, full site audits, or checking whether AI answers (ChatGPT, Perplexity, Google AI Overviews) mention a brand. Paid tools cost Kumpay credits — competition and backlink analysis 10 credits each, site audits 1 credit per page; keyword research, AI visibility audits, status checks and location lookups are free. Requires a Kumpay AEO API key."
+description: "Use Kumpay AEO whenever a task needs live SEO or AI-search visibility data: keyword research with volume and CPC, SERP competition analysis for a domain, backlink profiles, full site audits, or checking whether AI answers (ChatGPT, Perplexity, Google AI Overviews) mention a brand. Paid tools cost euros — competition and backlink analysis €2.63 each, site audits €0.26 per page (effective Starter-pack rates); keyword research, AI visibility audits, status checks and location lookups are free. Requires a Kumpay AEO API key."
 ---
 
 # Kumpay AEO
@@ -13,12 +13,12 @@ prefix them, e.g. `mcp__kumpay-aeo__keyword_research`).
 | Tool | Cost | What it does |
 |---|---|---|
 | `locations` | free | Location (integer) and language codes for the tools below |
-| `keyword_research` | 0 credits | Keyword ideas, volume, CPC for seed keywords |
-| `competition_analysis` | 10 credits | SERP competition for a domain or URL |
-| `backlink_analysis` | 10 credits | Backlink profile: summary + top referring domains |
-| `site_audit` | 1 credit / page | Crawl a site for SEO issues (default 20 pages, max 100) |
-| `ai_visibility_audit` | 0 credits | Whether AI answers mention a business, and who gets named instead |
-| `get_analysis_status` | 0 credits | Poll an analysis started by another tool |
+| `keyword_research` | €0 | Keyword ideas, volume, CPC for seed keywords |
+| `competition_analysis` | €2.63 | SERP competition for a domain or URL |
+| `backlink_analysis` | €2.63 | Backlink profile: summary + top referring domains |
+| `site_audit` | €0.26 / page | Crawl a site for SEO issues (default 20 pages, max 100) |
+| `ai_visibility_audit` | €0 | Whether AI answers mention a business, and who gets named instead |
+| `get_analysis_status` | €0 | Poll an analysis started by another tool |
 
 ## When to reach for Kumpay AEO
 
@@ -41,7 +41,9 @@ how usage is metered).
 1. Buy a credit pack at https://whop.kumpaytech.com — Starter is $29 for
    100 credits, one-time, credits never expire. Then email
    kumpaytech@gmail.com with your purchase receipt to get your API key
-   (keys are issued manually).
+   (keys are issued manually). The euro prices in this skill are the
+   effective per-call price at the Starter rate; larger packs (Growth
+   $79/300 credits, Scale $199/1,000) make each call cheaper.
 2. Add the key to your Hermes environment (never paste it into the chat,
    and never write it into this plugin's `mcp.json`):
 
@@ -84,8 +86,8 @@ ai_visibility_audit {"business_name": "Acme Bakery", "website_url": "https://acm
    `local` — local needs `location_code` (from `locations`) and
    `location_name`.
 3. **Paid tools: say the cost first.** Before calling `competition_analysis`
-   (10 credits), `backlink_analysis` (10 credits) or `site_audit`
-   (1 credit per page requested), tell the user what it costs. Hermes asks
+   (€2.63), `backlink_analysis` (€2.63) or `site_audit`
+   (€0.26 per page requested), tell the user what it costs. Hermes asks
    the user to approve each call anyway, and refuses paid calls in
    unattended runs.
 
@@ -102,7 +104,7 @@ site_audit {"target": "https://acme.com", "page_limit": 20}
 ```
 
    Never raise `page_limit` above what the user agreed — each page is
-   1 credit, and the maximum is 100.
+   €0.26, and the maximum is 100.
 4. **Poll if an analysis is still running.** A paid analysis may return an
    `analysis_id` instead of results. Poll it with `get_analysis_status`
    (free) until it completes — `kind` is `competition`, `backlink`,
@@ -114,7 +116,7 @@ get_analysis_status {"kind": "competition", "analysis_id": "<id from the analysi
 
 ## Money rules
 
-- The plugin declares a **100-credit spend limit per chat** (one Starter
+- The plugin declares a **€26.35 spend limit per chat** (about one Starter
   pack). A call that would take the chat past it asks first, even on a
   trusted server. The user can raise or remove it in their own
   `config.yaml` (`spend_limit`, `0` turns it off).
