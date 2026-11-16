@@ -1,0 +1,12 @@
+{
+    "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
+    "mcpServers": {
+        "kumpay-aeo": {
+            "headers": {
+                "Authorization": "Bearer ${KUMPAY_AEO_API_KEY}"
+            },
+            "type": "streamable-http",
+            "url": "https://mcp.kumpaytech.com/mcp"
+        }
+    }
+}

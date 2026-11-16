@@ -71,3 +71,38 @@ Separate service from the Whop app. Uses the included `Dockerfile`
 (port 8080). Required env: `SERPSLING_AUTH_KEY`, `ADMIN_TOKEN`,
 `KEY_PEPPER`. Needs a real domain + HTTPS before pointing buyers at it.
 Persist `/app/data` (SQLite) with a volume.
+
+## Hermes Agent plugin
+
+This repo is also a Portable Agent Plugins v1 package for
+[Hermes Agent](https://hermes-agent.nousresearch.com): `plugin.json` +
+`mcp.json` + the `kumpay-aeo` skill under `skills/`.
+
+Install (before the catalog listing merges):
+
+```bash
+hermes plugins install kumpayinteractive-sudo/kumpay-aeo-mcp --no-enable
+hermes plugins enable kumpay-aeo
+```
+
+Then add your API key to `~/.hermes/.env`:
+
+```
+KUMPAY_AEO_API_KEY=sk_mcp_...
+```
+
+Buy a credit pack at https://whop.kumpaytech.com — Starter is $29 for
+100 credits, one-time, credits never expire. Then email
+kumpaytech@gmail.com with your purchase receipt to get your API key
+(keys are issued manually). Paid tools: competition and backlink analysis
+10 credits each, site audits 1 credit per page. Keyword research, AI
+visibility audits, status checks and location lookups are free. The plugin
+declares a 100-credit spend limit per chat, and Hermes asks before each
+call.
+
+Disclosure: every tool call goes to `https://mcp.kumpaytech.com/mcp` and
+forwards the domains, keywords and business names you check to Kumpay
+Tech's upstream SEO data provider. The plugin collects no telemetry.
+Installing the plugin runs no code on your machine — it only registers
+the hosted MCP server and loads the skill. (The server source in this repo
+is for self-hosting; see Quick start above.)

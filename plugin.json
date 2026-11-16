@@ -1,0 +1,50 @@
+{
+    "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+    "author": {
+        "email": "kumpaytech@gmail.com",
+        "name": "Kumpay Tech",
+        "url": "https://kumpaytech.com"
+    },
+    "description": "Give your AI agent live SEO superpowers: SERP competition analysis, keyword research, backlink profiles, full site audits, and AI-search visibility scoring — via 7 metered MCP tools.",
+    "extensions": {
+        "com.nousresearch.hermes": {
+            "servers": {
+                "kumpay-aeo": {
+                    "cost_unit": "credits",
+                    "costs": {
+                        "ai_visibility_audit": 0,
+                        "backlink_analysis": 10,
+                        "competition_analysis": 10,
+                        "get_analysis_status": 0,
+                        "keyword_research": 0,
+                        "locations": 0,
+                        "site_audit": {
+                            "credits": [
+                                1,
+                                100
+                            ],
+                            "note": "1 credit per page requested (default 20)"
+                        }
+                    },
+                    "spend_limit": 100,
+                    "trust": "untrusted"
+                }
+            }
+        }
+    },
+    "homepage": "https://kumpaytech.com",
+    "keywords": [
+        "kumpay-aeo",
+        "aeo",
+        "geo",
+        "seo",
+        "ai-visibility",
+        "serp",
+        "keyword-research",
+        "backlinks",
+        "site-audit"
+    ],
+    "name": "kumpay-aeo",
+    "repository": "https://github.com/kumpayinteractive-sudo/kumpay-aeo-mcp",
+    "version": "1.0.0"
+}
