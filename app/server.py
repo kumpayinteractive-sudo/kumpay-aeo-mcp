@@ -146,6 +146,13 @@ def _admin_ok(request: Request) -> bool:
         request.query_params.get("token") == config.ADMIN_TOKEN
 
 
+def _admin_header_ok(request: Request) -> bool:
+    """Header-only admin guard for NEW endpoints. Query tokens are not
+    accepted here (they leak into logs and referrers)."""
+    return bool(config.ADMIN_TOKEN) and \
+        request.headers.get("x-admin-token") == config.ADMIN_TOKEN
+
+
 @app.get("/admin/usage")
 def admin_usage(request: Request, buyer: str | None = None):
     if not _admin_ok(request):
@@ -158,3 +165,41 @@ def admin_buyers(request: Request):
     if not _admin_ok(request):
         return JSONResponse({"error": "forbidden"}, status_code=403)
     return {"buyers": store.list_keys()}
+
+
+@app.get("/admin/balance")
+def admin_balance(request: Request, buyer: str):
+    """Buyer credit balance. Header guard: X-Admin-Token."""
+    if not _admin_header_ok(request):
+        return JSONResponse({"error": "forbidden"}, status_code=403)
+    balance = store.get_balance(buyer)
+    if balance is None:
+        return JSONResponse({"error": f"buyer '{buyer}' not found"},
+                            status_code=404)
+    return {"buyer": buyer, "credits": balance}
+
+
+@app.post("/admin/grant")
+async def admin_grant(request: Request):
+    """Grant credits to a buyer (pack purchase).
+    Header guard: X-Admin-Token. Body: {"buyer": name, "credits": N}."""
+    if not _admin_header_ok(request):
+        return JSONResponse({"error": "forbidden"}, status_code=403)
+    try:
+        body = await request.json()
+    except Exception:
+        return JSONResponse({"error": "invalid JSON body"}, status_code=400)
+    buyer = body.get("buyer") if isinstance(body, dict) else None
+    credits = body.get("credits") if isinstance(body, dict) else None
+    if (not buyer or not isinstance(credits, int)
+            or isinstance(credits, bool) or credits <= 0):
+        return JSONResponse(
+            {"error": "body must be {\"buyer\": name, "
+                      "\"credits\": positive integer}"},
+            status_code=400)
+    try:
+        new_balance = store.grant_credits(buyer, credits)
+    except ValueError:
+        return JSONResponse({"error": f"buyer '{buyer}' not found"},
+                            status_code=404)
+    return {"buyer": buyer, "credits": new_balance}

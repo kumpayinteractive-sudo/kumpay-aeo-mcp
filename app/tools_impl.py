@@ -167,15 +167,43 @@ def _waiter_for(client, kind: str):
     return getattr(client, names[kind])
 
 
+def _reserve(buyer: str, cost: int) -> None:
+    """Reserve `cost` credits before the paid provider call.
+
+    Zero-cost calls skip the check entirely. On insufficient balance
+    raises InsufficientCreditsError naming the cost and the balance.
+    """
+    if cost <= 0:
+        return
+    if store.reserve_credits(buyer, cost):
+        return
+    balance = store.get_balance(buyer)
+    raise store.InsufficientCreditsError(
+        cost, balance if balance is not None else 0)
+
+
 def _create_and_wait(kind: str, create_fn, timeout: int | None = None) -> dict:
-    client = get_client()
-    created = create_fn()
-    id_ = created.get("_id") or created.get("id")
-    if not id_:
-        raise SerpslingError(f"Serpsling returned no id: "
-                             f"{json.dumps(created)[:300]}")
-    store.log_usage(buyer_ctx.get(), kind, _COSTS[kind],
-                    detail=f"target id {id_}")
+    """Reserve -> create (provider accepts = paid side effect) -> wait.
+
+    The reservation is refunded in full only if the create call itself
+    fails (exception or no id returned). Once the provider accepts the
+    analysis, the charge stands: the buyer can poll the id with
+    get_analysis_status even if this wait is interrupted.
+    """
+    cost = _COSTS[kind]
+    buyer = buyer_ctx.get()
+    _reserve(buyer, cost)
+    try:
+        client = get_client()
+        created = create_fn()
+        id_ = created.get("_id") or created.get("id")
+        if not id_:
+            raise SerpslingError(f"Serpsling returned no id: "
+                                 f"{json.dumps(created)[:300]}")
+    except Exception:
+        store.refund_credits(buyer, cost)
+        raise
+    store.log_usage(buyer, kind, cost, detail=f"target id {id_}")
     data = _waiter_for(client, kind)(id_, timeout)
     if data.get("status") != "complete":
         return _pending(kind, id_, data.get("status", "unknown"))
@@ -228,10 +256,19 @@ def site_audit(target: str,
                page_limit: int = config.SITE_AUDIT_DEFAULT_PAGES) -> dict:
     """Crawl a site for SEO issues. Costs 1 credit per page requested."""
     page_limit = max(1, min(config.SITE_AUDIT_MAX_PAGES, page_limit))
-    client = get_client()
-    created = client.create_site_audit(target, page_limit)
-    audit_id = created.get("_id") or created.get("id")
-    store.log_usage(buyer_ctx.get(), "site_audit", page_limit,
+    buyer = buyer_ctx.get()
+    _reserve(buyer, page_limit)
+    try:
+        client = get_client()
+        created = client.create_site_audit(target, page_limit)
+        audit_id = created.get("_id") or created.get("id")
+        if not audit_id:
+            raise SerpslingError(f"Serpsling returned no id: "
+                                 f"{json.dumps(created)[:300]}")
+    except Exception:
+        store.refund_credits(buyer, page_limit)
+        raise
+    store.log_usage(buyer, "site_audit", page_limit,
                     detail=f"audit {audit_id}, {page_limit} pages requested")
     data = client.wait_site_audit(audit_id)
     if data.get("status") != "complete":
