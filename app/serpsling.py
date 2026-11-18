@@ -7,6 +7,7 @@ Never guess a schema here -- verify against those sources first.
 from __future__ import annotations
 
 import time
+from urllib.parse import quote
 
 import httpx
 
@@ -76,7 +77,11 @@ class SerpslingClient:
         })
 
     def get_keyword_research(self, kr_id: str) -> dict:
-        return self._request("GET", f"/private/keyword_research/{kr_id}")
+        # Quote the buyer-supplied id: an unquoted "../" segment would
+        # let httpx normalize the path onto a different provider endpoint
+        # (e.g. ../../private/credits leaks the shared pool balance).
+        return self._request(
+            "GET", f"/private/keyword_research/{quote(str(kr_id), safe='')}")
 
     def wait_keyword_research(self, kr_id: str,
                               timeout: int | None = None) -> dict:
@@ -94,7 +99,8 @@ class SerpslingClient:
 
     def get_competition_analysis(self, analysis_id: str) -> dict:
         return self._request(
-            "GET", f"/private/competition_analysis/{analysis_id}")
+            "GET", "/private/competition_analysis/"
+            f"{quote(str(analysis_id), safe='')}")
 
     def wait_competition_analysis(self, analysis_id: str,
                                   timeout: int | None = None) -> dict:
@@ -109,7 +115,8 @@ class SerpslingClient:
 
     def get_backlink_analysis(self, analysis_id: str) -> dict:
         return self._request(
-            "GET", f"/private/backlink_analysis/{analysis_id}")
+            "GET", "/private/backlink_analysis/"
+            f"{quote(str(analysis_id), safe='')}")
 
     def wait_backlink_analysis(self, analysis_id: str,
                                timeout: int | None = None) -> dict:
@@ -123,7 +130,8 @@ class SerpslingClient:
         })
 
     def get_site_audit(self, audit_id: str) -> dict:
-        return self._request("GET", f"/private/site_audit/{audit_id}")
+        return self._request(
+            "GET", f"/private/site_audit/{quote(str(audit_id), safe='')}")
 
     def wait_site_audit(self, audit_id: str,
                         timeout: int | None = None) -> dict:
@@ -144,7 +152,9 @@ class SerpslingClient:
         return self._request("POST", "/private/ai_visibility_audit", json=body)
 
     def get_ai_visibility_audit(self, audit_id: str) -> dict:
-        return self._request("GET", f"/private/ai_visibility_audit/{audit_id}")
+        return self._request(
+            "GET", "/private/ai_visibility_audit/"
+            f"{quote(str(audit_id), safe='')}")
 
     def wait_ai_visibility_audit(self, audit_id: str,
                                  timeout: int | None = None) -> dict:

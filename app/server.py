@@ -10,9 +10,9 @@ Buyer keys:
 """
 from __future__ import annotations
 
-import functools
-
 import contextlib
+import functools
+import hmac
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
@@ -142,15 +142,15 @@ def health():
 
 
 def _admin_ok(request: Request) -> bool:
-    return bool(config.ADMIN_TOKEN) and \
-        request.query_params.get("token") == config.ADMIN_TOKEN
+    return bool(config.ADMIN_TOKEN) and hmac.compare_digest(
+        request.query_params.get("token") or "", config.ADMIN_TOKEN)
 
 
 def _admin_header_ok(request: Request) -> bool:
     """Header-only admin guard for NEW endpoints. Query tokens are not
     accepted here (they leak into logs and referrers)."""
-    return bool(config.ADMIN_TOKEN) and \
-        request.headers.get("x-admin-token") == config.ADMIN_TOKEN
+    return bool(config.ADMIN_TOKEN) and hmac.compare_digest(
+        request.headers.get("x-admin-token") or "", config.ADMIN_TOKEN)
 
 
 @app.get("/admin/usage")
